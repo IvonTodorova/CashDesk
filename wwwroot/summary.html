@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script>
+        window.onload = function () {
+
+            let queryString = getQueryString();
+
+            fetch("api/DayTrunOver/GetDayTrunOver?" + queryString,
+                {
+                    method: "POST",
+                    body: queryString
+                })
+                .then(response => response.json())
+                .then(data => setPageValues(data))
+                .catch(error => console.error('Unable get balance.', error));
+        
+        };
+
+        function getQueryString() {
+            let sessionKey = localStorage.getItem("sessionKey");
+            console.log("Session Key:");
+            console.log(sessionKey);
+            let queryString = "sessionKey=" + sessionKey;
+            queryString += "&date=" + "12-10-2021";
+            return queryString;
+        }
+
+        function setPageValues(resp) {
+            console.log(resp);
+            let incomeField = document.getElementById("Income");
+            incomeField.innerHTML = resp.incomes[0].value;
+        }
+
+    </script>
+</head>
+<body>
+    <h1>Daily Balance</h1>
+    <h3>Income:</h3><h3 id="Income"></h3>
+    <h3>Expense:</h3><h3 id="Expense"></h3>
+    <h3>Date:</h3><h3 id="Date"></h3>
+
+</body>
+</html>
