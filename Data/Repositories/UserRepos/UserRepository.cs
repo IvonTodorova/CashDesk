@@ -142,9 +142,6 @@ namespace CashDesk.Data.Repositories.UserRepos
             foreach (var income in incomes)
             {
                 todaysIncomes += income.Value;
-
-               
-
             }
             foreach (var expense in expenses)
             {
@@ -152,7 +149,6 @@ namespace CashDesk.Data.Repositories.UserRepos
             }
             var dayBalance = todaysIncomes - todaysExpenses;
             return dayBalance;
-
         }
 }
 }

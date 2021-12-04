@@ -67,6 +67,7 @@ namespace CashDesk.Controllers
             {
                 return BadRequest("Invalid Seesion Key.");
             }
+
             try
             {
                 _expenseRepo.EditExpense(expense);
@@ -78,12 +79,13 @@ namespace CashDesk.Controllers
                 return BadRequest(e.Message);               
             }
         }
-        [HttpGet]
-      [Route(GetAllExpenses)]
 
-      public ActionResult GetAllExpenses()
-       {
+      //  [HttpGet]
+      //[Route(GetAllExpenses)]
 
-       }
+      //public ActionResult GetAllExpenses()
+      // {
+
+      // }
     }
 }

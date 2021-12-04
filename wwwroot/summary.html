@@ -24,9 +24,21 @@
             console.log("Session Key:");
             console.log(sessionKey);
             let queryString = "sessionKey=" + sessionKey;
-            queryString += "&date=" + "12-10-2021";
+            queryString += "&date=" + formatDate(new Date());
             return queryString;
         }
+
+        // converts the date object in "mm-dd-yyyy" string 
+         function formatDate(d) {
+            var mm = d.getMonth() + 1; // getMonth() is zero-based
+            var dd = d.getDate();
+
+            return [
+                (mm > 9 ? '' : '0') + mm,
+                (dd > 9 ? '' : '0') + dd,
+                d.getFullYear()
+            ].join('-');
+        };
 
         function setPageValues(resp) {
             console.log(resp);

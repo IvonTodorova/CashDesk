@@ -90,6 +90,7 @@ namespace CashDesk.Controllers
                 };
                 _dayTurnOverRepository.CreateDayTurnOver(dailyTurnOver);
                 _context.SaveChanges();
+
                 return Ok(updatedUserDto);               
             }
             catch (Exception)
