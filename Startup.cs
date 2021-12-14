@@ -16,7 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using CashDesk.Data.Repositories;
 using AutoMapper;
 using CashDesk.Data.Repositories.UserRepos;
-using CashDesk.Data.Repositories.DayTurnOverRepos;
+//using CashDesk.Data.Repositories.DayTurnOverRepos;
 using Newtonsoft.Json;
 using CashDesk.Data.Repositories.CategoryRepos;
 using CashDesk.Data.Repositories.ExpenseRepos;
@@ -54,7 +54,6 @@ namespace CashDesk
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<IDayTurnOverRepository, DayTurnOverRepository>();
             services.AddScoped<IExpenseRepository, ExpenseRepository>();
             services.AddScoped<IIncomeRepository, IncomeRepository>();
 

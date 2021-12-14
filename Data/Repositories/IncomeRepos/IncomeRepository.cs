@@ -1,4 +1,5 @@
 ﻿using CashDesk.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,12 @@ namespace CashDesk.Data.Repositories.IncomeRepos
             return income;
         }
 
-        
+        public ICollection<Income> GetIncomeByDate(DateTime date)
+        {
+            var incomesByDate = _context.Incomes.Where(d => d.IncomeDate == date).ToList();  
+            
+            return incomesByDate;
+        }
         public void EditIncome(Income income)
         {
             var item = _context.Incomes.FirstOrDefault(x => x.Id == income.Id);

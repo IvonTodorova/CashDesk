@@ -20,6 +20,7 @@ namespace CashDesk.Data.Repositories.UserRepos
         void UpdateUser(UserDto updatedUser);
         bool ValidateSessionKey(string sessionKey);
         public User GetUserBySessionKey(string sessionKey);
-        public decimal GetDailyBalance(int count);
+        //public decimal GetDailyBalance(int count);
+        public string HashPassword(string password);
     }
 }

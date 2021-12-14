@@ -1,6 +1,7 @@
 ﻿using CashDesk.Data;
 using CashDesk.Data.Attributes;
 using CashDesk.Data.Models;
+using CashDesk.Data.Repositories.CategoryRepos;
 using CashDesk.Data.Repositories.IncomeRepos;
 using CashDesk.Data.Repositories.UserRepos;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +18,13 @@ namespace CashDesk.Controllers
         private readonly CashDeskDbContext _context;
         private readonly IIncomeRepository _incomeRepo;
         private readonly IUserRepository _userRepository;
-        public IncomeController(CashDeskDbContext _context, IIncomeRepository _incomeRepo, IUserRepository _userRepository)
+        private readonly ICategoryRepository _categoryRepository;
+        public IncomeController(CashDeskDbContext _context, IIncomeRepository _incomeRepo, IUserRepository _userRepository, ICategoryRepository _categoryRepository)
         {
             this._context = _context;
             this._incomeRepo = _incomeRepo;
             this._userRepository = _userRepository;
+            this._categoryRepository = _categoryRepository;
         }
 
         [HttpPost]
@@ -41,17 +44,21 @@ namespace CashDesk.Controllers
             }
 
             var userBySessionKey = _userRepository.GetUserBySessionKey(sessionKey);
-
+            var category = _categoryRepository.GetCategoryById(income.CategoryId);
             Income newIncome = new Income
             {
-               IncomeDate = new DateTime().Date,
+               IncomeDate = DateTime.Now.Date,
                Value=income.Value,
                Title=income.Title,
                IncomeUserId=userBySessionKey.Id,
-            }; 
+               CategoryId = category.Id,
+            };
 
+            _incomeRepo.CreateDailyIncome(newIncome);
+            _context.SaveChanges();
             return Ok();
         }
+
         [HttpPost]
         [Route("EditIncome")]
         public ActionResult EditIncome([ValueProvider(typeof(HeaderValueProviderFactory<string>))] string sessionKey, Income income)

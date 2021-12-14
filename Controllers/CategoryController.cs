@@ -81,12 +81,12 @@ namespace CashDesk.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllCategoriesBy")]
+        [Route("GetAllCategories")]
         public ActionResult GetAllCategory([ValueProvider(typeof(HeaderValueProviderFactory<string>))] string sessionKey)
         {
             List<Category> categories = new List<Category>();
 
-            var getallCategories = _categoryRepo.GetAllCategoriesBy();
+            var getallCategories = _categoryRepo.GetAllCategories();
 
             foreach (var item in getallCategories)
             {

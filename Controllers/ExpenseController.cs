@@ -1,6 +1,8 @@
 ﻿using CashDesk.Data;
 using CashDesk.Data.Attributes;
+using CashDesk.Data.Dto;
 using CashDesk.Data.Models;
+using CashDesk.Data.Repositories.CategoryRepos;
 using CashDesk.Data.Repositories.ExpenseRepos;
 using CashDesk.Data.Repositories.UserRepos;
 using Microsoft.AspNetCore.Mvc;
@@ -19,14 +21,16 @@ namespace CashDesk.Controllers
         private readonly CashDeskDbContext _context;
         private readonly IExpenseRepository _expenseRepo;
         private readonly IUserRepository _userRepo;
-        public ExpenseController(CashDeskDbContext _context, IExpenseRepository _expenseRepo, IUserRepository _userRepo)
+        private readonly ICategoryRepository _categoryRepository;
+        public ExpenseController(CashDeskDbContext _context, IExpenseRepository _expenseRepo, IUserRepository _userRepo, ICategoryRepository _categoryRepository)
         {
             this._context = _context;
             this._expenseRepo = _expenseRepo;
             this._userRepo = _userRepo;
+            this._categoryRepository = _categoryRepository;
         }
 
-        [HttpPost]
+      [HttpPost]
         [Route("CreateExpense")]
         public ActionResult<Expense> CreateExpense([ValueProvider(typeof(HeaderValueProviderFactory<string>))] string sessionKey, Expense expense)
         {
@@ -41,15 +45,17 @@ namespace CashDesk.Controllers
             }
 
             var userBySessionKey = _userRepo.GetUserBySessionKey(sessionKey);
-            var receiver = _context.Users.FirstOrDefault(x => x.Name == expense.ReceiverExpense.Name && x.LastName == expense.ReceiverExpense.LastName);           
+            var receiver = _context.Users.FirstOrDefault(x => x.Id == expense.ReceiverExpenseId);         
 
             Expense newExpense = new Expense
             {
                 Value = expense.Value,
-                ExpenseDate = new DateTime().Date,
+                ExpenseDate = DateTime.Now.Date,
                 Title = expense.Title,
-                ReceiverExpenseId=receiver.Id,
+                ReceiverExpenseId = receiver.Id,
                 CreaterExpenseId = userBySessionKey.Id,
+                CategoryId=1,
+                //get category by id
             };
 
             _expenseRepo.CreateDailyOutcome(newExpense);
@@ -80,12 +86,55 @@ namespace CashDesk.Controllers
             }
         }
 
-      //  [HttpGet]
-      //[Route(GetAllExpenses)]
+        [HttpGet]
+        [Route("GetAllExpenses")]
 
-      //public ActionResult GetAllExpenses()
-      // {
+        public ActionResult GetAllExpenses()
+        {
+            List<Expense> expenses = new List<Expense>();
 
-      // }
+            var allExpenses = _expenseRepo.GetAllExpenses();
+            foreach (var item in allExpenses)
+            {
+                expenses.Add(item);
+            }
+            return Ok(expenses);
+        }
+
+        [HttpPost]
+        [Route("GetCategoryExpenseFilter")]
+        public ActionResult<ICollection<Expense>> GetCategoryExpenseFilter([ValueProvider(typeof(HeaderValueProviderFactory<string>))] Category category,string sessionKey, DateTime startDate, DateTime endDate)
+        {
+            bool isSessionKeyValid = _userRepo.ValidateSessionKey(sessionKey);
+            if (!isSessionKeyValid)
+            {
+                return BadRequest("Invalid Seesion Key.");
+            }
+
+            FilterArgs filter = new FilterArgs
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                CategoryId = _categoryRepository.GetCategoryByName(category).Id,
+            };
+
+            var currentDatesExpenses = _expenseRepo.Filter(filter);
+
+            //var allExpenses = _expenseRepo.GetAllExpenses();
+            //var getCategoryName = _categoryRepository.GetCategoryByName(category);
+            //var getDatesBetweenTwoDates = GetDatesBetween(startDate, endDate);
+            List<Expense> expenses = new List<Expense>();
+
+            return Ok(currentDatesExpenses);
+        }
+
+        //private List<DateTime> GetDatesBetween(DateTime startDate, DateTime endDate)
+        //{
+        //    List<DateTime> allDates = new List<DateTime>();
+
+        //    for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
+        //        allDates.Add(date);
+        //    return allDates;
+        //}
     }
 }

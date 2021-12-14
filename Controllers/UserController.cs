@@ -4,7 +4,6 @@ using CashDesk.Data.Attributes;
 using CashDesk.Data.Dto;
 using CashDesk.Data.Models;
 using CashDesk.Data.Repositories;
-using CashDesk.Data.Repositories.DayTurnOverRepos;
 using CashDesk.Data.Repositories.UserRepos;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -23,13 +22,11 @@ namespace CashDesk.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly CashDeskDbContext _context;
-        private readonly IDayTurnOverRepository _dayTurnOverRepository;
-        public UserController(IUserRepository userRepository, IMapper mapper, CashDeskDbContext context, IDayTurnOverRepository _dayTurnOverRepository)
+        public UserController(IUserRepository userRepository, IMapper mapper, CashDeskDbContext context)
         {
             this._userRepository = userRepository;
             this._mapper = mapper;
             this._context = context;
-            this._dayTurnOverRepository = _dayTurnOverRepository;
         }
 
         [HttpPost]
@@ -44,7 +41,7 @@ namespace CashDesk.Controllers
                 Position = userDto.Position,
                 Salarie = (int)userDto.Salarie,
                 BankAccount = userDto.BankAccount,
-                AutificationKey = userDto.AutificationKey,
+                AutificationKey =_userRepository.HashPassword(userDto.AutificationKey),
                 IsActive = true,
             };
             _userRepository.CreateUser(user);
@@ -67,28 +64,7 @@ namespace CashDesk.Controllers
             {
                 var loggedUser = _userRepository.Login(userDto.Name, userDto.AutificationKey);
                 var updatedUserDto = _mapper.Map<UserDto>(loggedUser);
-                int count = -1;
-
-                var  incomes = new List<Income>();
-                var income = new Income
-                {
-                    Value = _userRepository.GetDailyBalance(count),
-                    IncomeUserId= loggedUser.Id,
-                    IncomeDate=DateTime.Now,
-                    Title="Daily balance",
-                    CategoryId = 1,
-                };
-
-                incomes.Add(income);
-                var expenses = new List<Expense>();
-                DayTurnOver dailyTurnOver = new DayTurnOver
-                {
-                    SetDateTime = DateTime.Now.Date,
-                    ReceptionistId = loggedUser.Id,
-                    Incomes=incomes,
-                    Expenses=expenses,
-                };
-                _dayTurnOverRepository.CreateDayTurnOver(dailyTurnOver);
+               
                 _context.SaveChanges();
 
                 return Ok(updatedUserDto);               
@@ -165,17 +141,7 @@ namespace CashDesk.Controllers
                 return BadRequest(e.Message);
 
             }
-        }
-
-        //public ActionResult GetDailyBalance([ValueProvider(typeof(HeaderValueProviderFactory<string>))] string sessionKey)
-        //{
-        //    bool isSessionKeyValid = _userRepository.ValidateSessionKey(sessionKey);
-        //    if (!isSessionKeyValid)
-        //    {
-        //        return BadRequest("Invalid Seesion Key.");
-        //    }
-
-        //}
+        } 
 
     }
 }

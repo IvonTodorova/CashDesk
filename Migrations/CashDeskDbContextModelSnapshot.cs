@@ -37,26 +37,6 @@ namespace CashDesk.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("CashDesk.Data.Models.DayTurnOver", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("ReceptionistId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SetDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceptionistId");
-
-                    b.ToTable("DayTurnOver");
-                });
-
             modelBuilder.Entity("CashDesk.Data.Models.Expense", b =>
                 {
                     b.Property<int>("Id")
@@ -70,9 +50,6 @@ namespace CashDesk.Migrations
                     b.Property<int?>("CreaterExpenseId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DayTurnOverId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("ExpenseDate")
                         .HasColumnType("datetime2");
 
@@ -83,15 +60,13 @@ namespace CashDesk.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("CreaterExpenseId");
-
-                    b.HasIndex("DayTurnOverId");
 
                     b.HasIndex("ReceiverExpenseId");
 
@@ -105,29 +80,24 @@ namespace CashDesk.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("DayTurnOverId")
+                    b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("IncomeDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("IncomeUserId")
+                    b.Property<int>("IncomeUserId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Value")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("DayTurnOverId");
 
                     b.HasIndex("IncomeUserId");
 
@@ -170,15 +140,6 @@ namespace CashDesk.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("CashDesk.Data.Models.DayTurnOver", b =>
-                {
-                    b.HasOne("CashDesk.Data.Models.User", "Receptionist")
-                        .WithMany()
-                        .HasForeignKey("ReceptionistId");
-
-                    b.Navigation("Receptionist");
-                });
-
             modelBuilder.Entity("CashDesk.Data.Models.Expense", b =>
                 {
                     b.HasOne("CashDesk.Data.Models.Category", "Category")
@@ -189,10 +150,6 @@ namespace CashDesk.Migrations
                         .WithMany()
                         .HasForeignKey("CreaterExpenseId");
 
-                    b.HasOne("CashDesk.Data.Models.DayTurnOver", "DayTurnOver")
-                        .WithMany("Expenses")
-                        .HasForeignKey("DayTurnOverId");
-
                     b.HasOne("CashDesk.Data.Models.User", "ReceiverExpense")
                         .WithMany()
                         .HasForeignKey("ReceiverExpenseId");
@@ -201,8 +158,6 @@ namespace CashDesk.Migrations
 
                     b.Navigation("CreaterExpense");
 
-                    b.Navigation("DayTurnOver");
-
                     b.Navigation("ReceiverExpense");
                 });
 
@@ -210,28 +165,19 @@ namespace CashDesk.Migrations
                 {
                     b.HasOne("CashDesk.Data.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId");
-
-                    b.HasOne("CashDesk.Data.Models.DayTurnOver", "DayTurnOver")
-                        .WithMany("Income")
-                        .HasForeignKey("DayTurnOverId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("CashDesk.Data.Models.User", "IncomeUser")
                         .WithMany()
-                        .HasForeignKey("IncomeUserId");
+                        .HasForeignKey("IncomeUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Category");
 
-                    b.Navigation("DayTurnOver");
-
                     b.Navigation("IncomeUser");
-                });
-
-            modelBuilder.Entity("CashDesk.Data.Models.DayTurnOver", b =>
-                {
-                    b.Navigation("Expenses");
-
-                    b.Navigation("Income");
                 });
 #pragma warning restore 612, 618
         }

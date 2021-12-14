@@ -1,21 +1,21 @@
 ﻿using CashDesk.Data.Dto;
 using CashDesk.Data.Models;
-using CashDesk.Data.Repositories.DayTurnOverRepos;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace CashDesk.Data.Repositories.UserRepos
 {
     public class UserRepository : IUserRepository
     {
         private readonly CashDeskDbContext _context;
-        private readonly IDayTurnOverRepository _dayTurnOverRepository;
+        //private readonly IDayTurnOverRepository _dayTurnOverRepository;
 
-        public UserRepository(CashDeskDbContext context, IDayTurnOverRepository _dayTurnOverRepository)
+        public UserRepository(CashDeskDbContext context)
         {
             this._context = context;
-            this._dayTurnOverRepository = _dayTurnOverRepository;
         }
         public bool CheckUser(string userName)
         {
@@ -120,35 +120,26 @@ namespace CashDesk.Data.Repositories.UserRepos
         {
             return _context.Users.FirstOrDefault(x => x.SessionKey == sessionKey);
         }
-
-        public decimal GetDailyBalance(int count) 
+        public string HashPassword(string password)
         {
-            DateTime d1 = DateTime.Now;
-
-            //TODO check if there is an existing dayTurnOver
-
-            if (_dayTurnOverRepository.GetDayTurnOverByDate(d1.AddDays(count))== null)
-            {              
-                count--;
-                return GetDailyBalance(count); 
-            }
-
-            var day = _dayTurnOverRepository.GetDayTurnOverByDate(d1.AddDays(count));
-            var incomes = day.Incomes;
-            decimal todaysIncomes = 0;
-
-            var expenses = day.Expenses;
-            decimal todaysExpenses = 0;
-            foreach (var income in incomes)
+            // generate a 128-bit salt using a cryptographically strong random sequence of nonzero values
+            byte[] salt = new byte[128 / 8];
+            using (var rngCsp = new RNGCryptoServiceProvider())
             {
-                todaysIncomes += income.Value;
-            }
-            foreach (var expense in expenses)
-            {
-                todaysExpenses += expense.Value;
-            }
-            var dayBalance = todaysIncomes - todaysExpenses;
-            return dayBalance;
+                rngCsp.GetNonZeroBytes(salt);
+            }          
+
+            // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8));
+
+            return hashed;
         }
+    }
+        
 }
-}
+

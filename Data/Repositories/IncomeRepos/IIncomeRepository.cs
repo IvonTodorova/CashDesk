@@ -12,6 +12,8 @@ namespace CashDesk.Data.Repositories.IncomeRepos
         public ICollection<Income> GetAllIncomes();
         public Income GetIncomesById(int Id);
         public void EditIncome(Income income);
+        public ICollection<Income> GetIncomeByDate(DateTime date);
+
 
 
     }

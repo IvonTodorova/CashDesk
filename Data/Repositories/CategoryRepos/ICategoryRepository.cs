@@ -13,7 +13,10 @@ namespace CashDesk.Data.Repositories.CategoryRepos
         public void CreateCategory(Category category);
         public void DeleteCategory(int categoryId);
         public void EditCategory(Category category);
-        public ICollection<Category> GetAllCategoriesBy();
+        public ICollection<Category> GetAllCategories();
+        public Category GetCategoryById(int Id);
+        public Category GetCategoryByName(Category category);
+
 
     }
 }

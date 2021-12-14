@@ -46,11 +46,22 @@ namespace CashDesk.Data.Repositories.CategoryRepos
             }
         }
 
-        public ICollection<Category> GetAllCategoriesBy()
+        public ICollection<Category> GetAllCategories()
         {
             var categories = _context.Categories.ToList();
 
             return categories;
         }
-    }
+        public Category GetCategoryById(int Id)
+        {
+            var category = _context.Categories.FirstOrDefault(x => x.Id == Id);
+
+            return category;
+        }
+        public Category GetCategoryByName(Category category)
+        {
+            var categoryByName = _context.Categories.FirstOrDefault(x => x.Name == category.Name);
+            return categoryByName;
+        }
+}
 }

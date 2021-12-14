@@ -1,4 +1,5 @@
-﻿using CashDesk.Data.Models;
+﻿using CashDesk.Data.Dto;
+using CashDesk.Data.Models;
 using CashDesk.Data.Repositories.ExpenseRepos;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,22 @@ namespace CashDesk.Data.Repositories
         {
             var expenses = _context.Expenses.ToList();
             return expenses;
+        }
+        public ICollection<Expense> GetExpenseByDate(DateTime date)
+        {
+            var expensesByDate = _context.Expenses.Where(d => d.ExpenseDate == date).ToList();
+
+            return expensesByDate;
+        }
+
+        public ICollection<Expense> Filter(FilterArgs filterArgs)
+        {
+            //|TODO check if null values are provided to filter arguments
+            //TODO if null do not take in cosideration         
+            var filteredExpenses = _context.Expenses.Where(e => e.ExpenseDate >= filterArgs.StartDate
+                                                            || e.ExpenseDate <= filterArgs.EndDate
+                                                            && e.CategoryId == filterArgs.CategoryId);
+            return filteredExpenses.ToList();
         }
     }
 }
