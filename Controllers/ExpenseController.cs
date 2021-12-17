@@ -103,7 +103,7 @@ namespace CashDesk.Controllers
 
         [HttpPost]
         [Route("GetCategoryExpenseFilter")]
-        public ActionResult<ICollection<Expense>> GetCategoryExpenseFilter([ValueProvider(typeof(HeaderValueProviderFactory<string>))] Category category,string sessionKey, DateTime startDate, DateTime endDate)
+        public ActionResult<ICollection<Expense>> GetCategoryExpenseFilter([ValueProvider(typeof(HeaderValueProviderFactory<string>))] Category category,string sessionKey, DateTime startDate, DateTime endDate,string userName)
         {
             bool isSessionKeyValid = _userRepo.ValidateSessionKey(sessionKey);
             if (!isSessionKeyValid)
@@ -118,23 +118,29 @@ namespace CashDesk.Controllers
                 CategoryId = _categoryRepository.GetCategoryByName(category).Id,
             };
 
-            var currentDatesExpenses = _expenseRepo.Filter(filter);
-
-            //var allExpenses = _expenseRepo.GetAllExpenses();
-            //var getCategoryName = _categoryRepository.GetCategoryByName(category);
-            //var getDatesBetweenTwoDates = GetDatesBetween(startDate, endDate);
-            List<Expense> expenses = new List<Expense>();
-
+            var currentDatesExpenses = _expenseRepo.FilterByUser(filter,userName);
+           
             return Ok(currentDatesExpenses);
         }
+        [HttpPost]
+        [Route("GetByUserExpenseFilter")]
+        public ActionResult<ICollection<Expense>> GetByUserExpenseFilter([ValueProvider(typeof(HeaderValueProviderFactory<string>))] Category category, string sessionKey, DateTime startDate, DateTime endDate, string userName)
+        {
+            bool isSessionKeyValid = _userRepo.ValidateSessionKey(sessionKey);
+            if (!isSessionKeyValid)
+            {
+                return BadRequest("Invalid Seesion Key.");
+            }
 
-        //private List<DateTime> GetDatesBetween(DateTime startDate, DateTime endDate)
-        //{
-        //    List<DateTime> allDates = new List<DateTime>();
+            FilterArgs filter = new FilterArgs
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                CategoryId = _categoryRepository.GetCategoryByName(category).Id,
+            };
 
-        //    for (DateTime date = startDate; date <= endDate; date = date.AddDays(1))
-        //        allDates.Add(date);
-        //    return allDates;
-        //}
+            var currentIncomeFilter = _expenseRepo.FilterByUser(filter, userName);
+            return Ok(currentIncomeFilter);
+        }
     }
 }

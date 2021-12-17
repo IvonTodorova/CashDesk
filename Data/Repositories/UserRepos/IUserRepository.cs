@@ -22,5 +22,7 @@ namespace CashDesk.Data.Repositories.UserRepos
         public User GetUserBySessionKey(string sessionKey);
         //public decimal GetDailyBalance(int count);
         public string HashPassword(string password);
+        public User GetUserByName(string userName);
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using CashDesk.Data.Models;
+﻿using CashDesk.Data.Dto;
+using CashDesk.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,8 @@ namespace CashDesk.Data.Repositories.IncomeRepos
         public Income GetIncomesById(int Id);
         public void EditIncome(Income income);
         public ICollection<Income> GetIncomeByDate(DateTime date);
-
+        public ICollection<Income> Filter(FilterArgs filterArgs);
+        public ICollection<Income> FilterByUser(FilterArgs filterArgs, string userName);
 
 
     }

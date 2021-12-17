@@ -1,5 +1,6 @@
 ﻿using CashDesk.Data;
 using CashDesk.Data.Attributes;
+using CashDesk.Data.Dto;
 using CashDesk.Data.Models;
 using CashDesk.Data.Repositories.CategoryRepos;
 using CashDesk.Data.Repositories.IncomeRepos;
@@ -13,7 +14,7 @@ namespace CashDesk.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class IncomeController:Controller
+    public class IncomeController : Controller
     {
         private readonly CashDeskDbContext _context;
         private readonly IIncomeRepository _incomeRepo;
@@ -29,7 +30,7 @@ namespace CashDesk.Controllers
 
         [HttpPost]
         [Route("CreateIncome")]
-        public ActionResult<Income> CreateIncome([ValueProvider(typeof(HeaderValueProviderFactory<string>))] string sessionKey,Income income)
+        public ActionResult<Income> CreateIncome([ValueProvider(typeof(HeaderValueProviderFactory<string>))] string sessionKey, Income income)
         {
             bool isSessionKyeValid = _userRepository.ValidateSessionKey(sessionKey);
 
@@ -47,11 +48,11 @@ namespace CashDesk.Controllers
             var category = _categoryRepository.GetCategoryById(income.CategoryId);
             Income newIncome = new Income
             {
-               IncomeDate = DateTime.Now.Date,
-               Value=income.Value,
-               Title=income.Title,
-               IncomeUserId=userBySessionKey.Id,
-               CategoryId = category.Id,
+                IncomeDate = DateTime.Now.Date,
+                Value = income.Value,
+                Title = income.Title,
+                IncomeUserId = userBySessionKey.Id,
+                CategoryId = category.Id,
             };
 
             _incomeRepo.CreateDailyIncome(newIncome);
@@ -80,7 +81,7 @@ namespace CashDesk.Controllers
             {
 
                 return BadRequest(e.Message);
-            }        
+            }
 
         }
         [HttpGet]
@@ -99,6 +100,49 @@ namespace CashDesk.Controllers
             return Ok(incomes);
         }
 
+        [HttpGet]
+        [Route("GetCategoryIncomeFilter")]
+        public ActionResult<ICollection<Expense>> GetCategoryIncomeFilter([ValueProvider(typeof(HeaderValueProviderFactory<string>))] Category category, string sessionKey, DateTime startDate, DateTime endDate)
+        {
+            bool isSessionKeyValid = _userRepository.ValidateSessionKey(sessionKey);
+            if (!isSessionKeyValid)
+            {
+                return BadRequest("Invalid Seesion Key.");
+            }
 
+            FilterArgs filter = new FilterArgs
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                CategoryId = _categoryRepository.GetCategoryByName(category).Id
+            };
+
+            var currentIncomeFilter = _incomeRepo.Filter(filter);
+            return Ok(currentIncomeFilter);
+        }
+
+
+        [HttpGet]
+        [Route("GetByUserNameIncomeFilter")]
+        public ActionResult<ICollection<Expense>> GetByUserNameIncomeFilter([ValueProvider(typeof(HeaderValueProviderFactory<string>))] Category category, string sessionKey, DateTime startDate, DateTime endDate,string userName)
+        {
+            bool isSessionKeyValid = _userRepository.ValidateSessionKey(sessionKey);
+            if (!isSessionKeyValid)
+            {
+                return BadRequest("Invalid Seesion Key.");
+            }
+
+            FilterArgs filter = new FilterArgs
+            {
+                StartDate = startDate,
+                EndDate = endDate,
+                CategoryId = _categoryRepository.GetCategoryByName(category).Id,
+            };
+            var currentIncomeFilter = _incomeRepo.FilterByUser(filter,userName);
+            return Ok(currentIncomeFilter);
+
+        }
+
+      
     }
 }

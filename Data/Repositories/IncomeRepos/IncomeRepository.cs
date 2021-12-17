@@ -1,4 +1,6 @@
-﻿using CashDesk.Data.Models;
+﻿using CashDesk.Data.Dto;
+using CashDesk.Data.Models;
+using CashDesk.Data.Repositories.UserRepos;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,17 +12,18 @@ namespace CashDesk.Data.Repositories.IncomeRepos
     public class IncomeRepository:IIncomeRepository
     {
         private readonly CashDeskDbContext _context;
-        public IncomeRepository(CashDeskDbContext _context)
+        private readonly IUserRepository _userRepository;
+        public IncomeRepository(CashDeskDbContext _context, IUserRepository _userRepository)
         {
             this._context = _context;
+            this._userRepository = _userRepository;
         }
         public void CreateDailyIncome(Income income)
         {
             if (income == null)
             {
                 throw new ArgumentNullException(nameof(income));
-            }
-
+            }                     
             _context.Add(income);
             _context.SaveChanges();
         } 
@@ -61,7 +64,25 @@ namespace CashDesk.Data.Repositories.IncomeRepos
 
             _context.SaveChanges();
         }
-
+        public ICollection<Income> Filter(FilterArgs filterArgs)
+        {
+            //|TODO check if null values are provided to filter arguments
+            //TODO if null do not take in cosideration         
+            var filteredExpenses = _context.Incomes.Where(e => e.IncomeDate >= filterArgs.StartDate
+                                                            || e.IncomeDate <= filterArgs.EndDate
+                                                            && e.CategoryId == filterArgs.CategoryId);
+            return filteredExpenses.ToList();
+        }
+        public ICollection<Income> FilterByUser(FilterArgs filterArgs,string userName)
+        {
+            //|TODO check if null values are provided to filter arguments
+            //TODO if null do not take in cosideration
+            var user = _userRepository.GetUserByName(userName);
+            var filteredExpenses = _context.Incomes.Where(e => e.IncomeDate >= filterArgs.StartDate
+                                                            || e.IncomeDate <= filterArgs.EndDate
+                                                            && e.CategoryId == filterArgs.CategoryId && e.IncomeUserId==user.Id);
+            return filteredExpenses.ToList();
+        }
 
     }
 }

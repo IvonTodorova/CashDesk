@@ -1,6 +1,7 @@
 ﻿using CashDesk.Data.Dto;
 using CashDesk.Data.Models;
 using CashDesk.Data.Repositories.ExpenseRepos;
+using CashDesk.Data.Repositories.UserRepos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,12 @@ namespace CashDesk.Data.Repositories
     public class ExpenseRepository:IExpenseRepository
     {
         private readonly CashDeskDbContext _context;
-        public ExpenseRepository(CashDeskDbContext _context)
+        private readonly IUserRepository _userRepository;
+
+        public ExpenseRepository(CashDeskDbContext _context, IUserRepository _userRepository)
         {
             this._context = _context;
+            this._userRepository = _userRepository;
         }
         public void CreateDailyOutcome(Expense expense)
         {
@@ -65,6 +69,16 @@ namespace CashDesk.Data.Repositories
             var filteredExpenses = _context.Expenses.Where(e => e.ExpenseDate >= filterArgs.StartDate
                                                             || e.ExpenseDate <= filterArgs.EndDate
                                                             && e.CategoryId == filterArgs.CategoryId);
+            return filteredExpenses.ToList();
+        }
+        public ICollection<Expense> FilterByUser(FilterArgs filterArgs, string userName)
+        {
+            //|TODO check if null values are provided to filter arguments
+            //TODO if null do not take in cosideration
+            var user = _userRepository.GetUserByName(userName);
+            var filteredExpenses = _context.Expenses.Where(e => e.ExpenseDate >= filterArgs.StartDate
+                                                            || e.ExpenseDate <= filterArgs.EndDate
+                                                            && e.CategoryId == filterArgs.CategoryId && e.ReceiverExpenseId == user.Id);
             return filteredExpenses.ToList();
         }
     }

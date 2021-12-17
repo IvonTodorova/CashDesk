@@ -139,6 +139,12 @@ namespace CashDesk.Data.Repositories.UserRepos
 
             return hashed;
         }
+
+        public User GetUserByName(string userName)
+        {
+            var userByName = _context.Users.FirstOrDefault(x => x.Name == userName);
+            return userByName;
+        }
     }
         
 }
