@@ -8,10 +8,10 @@
 
             let queryString = getQueryString();
 
-            fetch("api/DayTurnOver/ GetDayTurnOverbyDate?" + queryString,
+            fetch("api/DayTrunOver/GetDayTurnOver?" + queryString,
                 {
-                    method: "POST",
-                    body: queryString
+                    method: "GET",
+                    //body: queryString
                 })
                 .then(response => response.json())
                 .then(data => setPageValues(data))
@@ -24,7 +24,8 @@
             console.log("Session Key:");
             console.log(sessionKey);
             let queryString = "sessionKey=" + sessionKey;
-            queryString += "&date=" + formatDate(new Date());
+            queryString += "&date=" + "12-11-2021";
+            //queryString += "&date=" + formatDate(new Date());
             return queryString;
         }
 
@@ -42,17 +43,53 @@
 
         function setPageValues(resp) {
             console.log(resp);
-            let incomeField = document.getElementById("Income");
-            incomeField.innerHTML = resp.incomes[0].value;
+            let dateField = document.getElementById("Date");
+            dateField.innerHTML = resp.setDateTime;
+
+            let beginningBalanceField = document.getElementById("BegginningBalance");
+            beginningBalanceField.innerHTML = resp.beginningBalance;
+
+            let currentBalanceField = document.getElementById("CurrentBalance");
+            currentBalanceField.innerHTML = resp.currentBalance;
+
+            let currentIncomesld = document.getElementById("Incomes");
+
+            for (var i = 0; i < resp.incomes.length; i++) {
+                var p = document.createElement("p");
+                //p.classList += 'album'; 
+                p.innerHTML = '<h2>' + resp.incomes[i].title + " " + resp.incomes[i].value + '</h2>';
+                //attr.value = "container";
+                currentIncomesld.appendChild(p); 
+            }
+
+
+            let currentExpensesld = document.getElementById("Expenses");
+
+            for (var i = 0; i < resp.expenses.length; i++) {
+                var p = document.createElement("p");
+                //p.classList += 'album'; 
+                p.innerHTML = '<h2>' + resp.expenses[i].title + " " + resp.expenses[i].value + '</h2>';
+                //attr.value = "container";
+                currentExpensesld.appendChild(p);
+            }
+
         }
 
     </script>
 </head>
 <body>
-    <h1>Daily Balance</h1>
-    <h3>Income:</h3><h3 id="Income"></h3>
-    <h3>Expense:</h3><h3 id="Expense"></h3>
-    <h3>Date:</h3><h3 id="Date"></h3>
+    <h1>Daily Balance</h1><h3 id="Date"></h3>
+    <h3>Begginning balance:</h3><h3 id="BegginningBalance"></h3>
+    <h3>Income:</h3>
+    <div id="Incomes">
+
+    </div>
+    <h3>Expense:</h3>
+    <div id="Expenses">
+
+    </div>
+    <h3>Current balance:</h3><h3 id="CurrentBalance"></h3>
+
 
 </body>
 </html>

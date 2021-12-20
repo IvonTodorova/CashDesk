@@ -37,7 +37,7 @@ namespace CashDesk.Controllers
             this._expenseRepository = _expenseRepository;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("GetDayTurnOver")]
         public ActionResult<DayTurnOver> PostDayTurnOverbyDate([ValueProvider(typeof(HeaderValueProviderFactory<string>))] string sessionKey, DateTime date)
         {
@@ -54,12 +54,11 @@ namespace CashDesk.Controllers
 
             DayTurnOver dateTyrnOver = new DayTurnOver
             {
-
                 SetDateTime = date.Date,
                 ReceptionistId = _userRepository.GetUserBySessionKey(sessionKey).Id,
                 Incomes = _incomeRepository.GetIncomeByDate(date.Date),
                 Expenses = _expenseRepository.GetExpenseByDate(date.Date),
-                CurrentBalance = GetDailyBalance(),
+                CurrentBalance = GetDailyBalance(date.Date),
                 //get the balance only for today: biginningBalance + vsichki prihodi dnes - vsichki razhodi dnes
                 BeginningBalance= GetStartingDayBalance(date),
                 //get daily balance (do predniq den vsichki prihodi minus vsichki razhodi)
@@ -72,20 +71,20 @@ namespace CashDesk.Controllers
             int count = -1;
             DateTime d1 = date.AddDays(count);
            
-            var incomebyDate = _context.Incomes.Where(x => x.IncomeDate == d1);
-            var expenseByDate = _context.Expenses.Where(x => x.ExpenseDate == d1);
+            var incomebyDate = _context.Incomes.Where(x => x.IncomeDate <= d1);
+            var expenseByDate = _context.Expenses.Where(x => x.ExpenseDate <= d1);
 
             decimal totalValueIncomes = 0;
             decimal totalValueExpenses = 0;
 
             foreach (var income in incomebyDate)
             {
-                var convertstringToDateTime = d1.Date.ToString("dd/MM/yyyy");
+                //var convertstringToDateTime = d1.Date.ToString("MM/dd/yyyy");
 
-                if (!String.IsNullOrEmpty(convertstringToDateTime))
-                {
-                    count--;
-                }
+                //if (!String.IsNullOrEmpty(convertstringToDateTime))
+                //{
+                //    count--;
+                //}
                 totalValueIncomes += income.Value;
             }
             
@@ -97,12 +96,10 @@ namespace CashDesk.Controllers
             return dailyBalace;
         }
         
-        private decimal GetDailyBalance()
-        {
-            DateTime d1 = DateTime.Now.Date;
-
-            var todayIncome = _context.Incomes.Where(x => x.IncomeDate == d1);
-            var todayExpense = _context.Expenses.Where(x => x.ExpenseDate == d1);
+        private decimal GetDailyBalance(DateTime d1)
+        {        
+            var todayIncome = _incomeRepository.GetIncomeByDate(d1.Date);
+            var todayExpense = _expenseRepository.GetExpenseByDate(d1.Date);
 
             decimal currentIncome = 0;
             decimal currentExpense = 0;
