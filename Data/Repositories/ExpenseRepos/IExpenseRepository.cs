@@ -15,6 +15,8 @@ namespace CashDesk.Data.Repositories.ExpenseRepos
         public ICollection<Expense> GetAllExpenses();
         public ICollection<Expense> Filter(FilterArgs filterArgs);
         public ICollection<Expense> FilterByUser(FilterArgs filterArgs, string userName);
+        public ICollection<Expense> GetExpenseByTitle(string title);
+
 
     }
 }

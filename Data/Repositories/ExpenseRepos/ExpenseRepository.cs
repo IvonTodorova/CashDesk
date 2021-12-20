@@ -81,5 +81,11 @@ namespace CashDesk.Data.Repositories
                                                             && e.CategoryId == filterArgs.CategoryId && e.ReceiverExpenseId == user.Id);
             return filteredExpenses.ToList();
         }
+        public ICollection<Expense> GetExpenseByTitle(string title)
+        {
+            var expenseByTitle = _context.Expenses.Where(x => x.Title == title);
+            return expenseByTitle.ToList();
+        }
+
     }
 }

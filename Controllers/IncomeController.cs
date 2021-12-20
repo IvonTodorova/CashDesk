@@ -143,6 +143,24 @@ namespace CashDesk.Controllers
 
         }
 
-      
+      [HttpGet]
+      [Route("GetIncomesByTitle")]
+      public ActionResult<ICollection<Income>> GetIncomesByTitle([ValueProvider(typeof(HeaderValueProviderFactory<string>))]  string sessionKey, string title)
+      {
+            bool isSessionKeyValid = _userRepository.ValidateSessionKey(sessionKey);
+            if (!isSessionKeyValid)
+            {
+                return BadRequest("Invalid Seesion Key.");
+            }
+
+            List<Income> incomes = new List<Income>();
+            var incomesByTite = _incomeRepo.GetIncomesByTitle(title);
+            foreach (var item in incomesByTite)
+            {
+                incomes.Add(item);
+            }
+
+            return Ok(incomes);
+        }
     }
 }

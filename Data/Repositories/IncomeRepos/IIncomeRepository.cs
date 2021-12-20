@@ -16,7 +16,7 @@ namespace CashDesk.Data.Repositories.IncomeRepos
         public ICollection<Income> GetIncomeByDate(DateTime date);
         public ICollection<Income> Filter(FilterArgs filterArgs);
         public ICollection<Income> FilterByUser(FilterArgs filterArgs, string userName);
-
+        public ICollection<Income> GetIncomesByTitle(string title);
 
     }
 }

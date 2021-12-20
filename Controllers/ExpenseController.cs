@@ -142,5 +142,25 @@ namespace CashDesk.Controllers
             var currentIncomeFilter = _expenseRepo.FilterByUser(filter, userName);
             return Ok(currentIncomeFilter);
         }
+
+        [HttpGet]
+        [Route("GetIncomesByTitle")]
+        public ActionResult<ICollection<Expense>> GetIncomesByTitle([ValueProvider(typeof(HeaderValueProviderFactory<string>))] string sessionKey, string title)
+        {
+            bool isSessionKeyValid = _userRepo.ValidateSessionKey(sessionKey);
+            if (!isSessionKeyValid)
+            {
+                return BadRequest("Invalid Seesion Key.");
+            }
+
+            List<Expense> expenses = new List<Expense>();
+            var incomesByTite = _expenseRepo.GetExpenseByTitle(title);
+            foreach (var item in incomesByTite)
+            {
+                expenses.Add(item);
+            }
+
+            return Ok(expenses);
+        }
     }
 }
