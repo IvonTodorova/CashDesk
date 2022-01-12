@@ -45,17 +45,17 @@ namespace CashDesk.Controllers
             }
 
             var userBySessionKey = _userRepo.GetUserBySessionKey(sessionKey);
-            var receiver = _context.Users.FirstOrDefault(x => x.Id == expense.ReceiverExpenseId);         
+            var receiver = _context.Users.FirstOrDefault(x => x.Id == expense.ReceiverExpenseId);
+            var category = _categoryRepository.GetCategoryById(expense.CategoryId);
 
             Expense newExpense = new Expense
             {
                 Value = expense.Value,
                 ExpenseDate = DateTime.Now.Date,
                 Title = expense.Title,
-                ReceiverExpenseId = receiver.Id,
+                ReceiverExpenseId = receiver?.Id,
                 CreaterExpenseId = userBySessionKey.Id,
-                CategoryId=1,
-                //get category by id
+                CategoryId= category.Id,              
             };
 
             _expenseRepo.CreateDailyOutcome(newExpense);

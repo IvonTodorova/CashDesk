@@ -4,7 +4,6 @@ using CashDesk.Data.Attributes;
 using CashDesk.Data.Dto;
 using CashDesk.Data.Models;
 using CashDesk.Data.Repositories;
-//using CashDesk.Data.Repositories.DayTurnOverRepos;
 using CashDesk.Data.Repositories.ExpenseRepos;
 using CashDesk.Data.Repositories.IncomeRepos;
 using CashDesk.Data.Repositories.UserRepos;
@@ -40,6 +39,7 @@ namespace CashDesk.Controllers
         [HttpGet]
         [Route("GetDayTurnOver")]
         public ActionResult<DayTurnOver> PostDayTurnOverbyDate([ValueProvider(typeof(HeaderValueProviderFactory<string>))] string sessionKey, DateTime date)
+        
         {
             bool isSessionKyeValid = _userRepository.ValidateSessionKey(sessionKey);
             if (!isSessionKyeValid)

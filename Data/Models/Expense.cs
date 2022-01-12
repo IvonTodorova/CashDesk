@@ -20,7 +20,7 @@ namespace CashDesk.Data.Models
         #nullable enable
         public virtual User? CreaterExpense { get; set; }
         #nullable enable
-        public int?  CategoryId { get; set; }
+        public int CategoryId { get; set; }
         #nullable enable
         public virtual Category? Category { get; set; }
         #nullable enable

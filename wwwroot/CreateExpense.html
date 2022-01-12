@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            font-family: Garamond, serif;
+            font-size: 20px;
+            background-color: aliceblue
+        }
+
+
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+        }
+
+            .topnav a {
+                float: left;
+                color: #f2f2f2;
+                text-align: center;
+                padding: 14px 16px;
+                text-decoration: none;
+                font-size: 30px;
+            }
+
+                .topnav a:hover {
+                    background-color: #ddd;
+                    color: black;
+                }
+
+                .topnav a.active {
+                    background-color: #04AA6D;
+                    color: white;
+                }
+    </style>
+    <meta charset="utf-8" />
+    <title></title>
+    <script>
+       function createNewExpense()
+       {
+           let value = document.getElementById("expenseValue").value;
+           let title = document.getElementById("expenseTitle").value;
+           let receiverId = document.getElementById("receiverId").value;
+           let categoryId = document.getElementById("categoryId").value;
+
+           const expenseInfo = {
+               value: value,
+               title: title,
+               receiverExpenseId: receiverId,
+               categoryId: categoryId
+           }
+
+           let sessionKey = localStorage.getItem("sessionKey");
+           let queryString = "sessionKey=" + sessionKey;
+
+           fetch("/api/Expense/CreateExpense?" + queryString,
+               {
+                   method: 'POST',
+                   headers: {
+                       'Accept': 'application/json',
+                       'Content-Type': 'application/json'
+                   },
+                   body: JSON.stringify(expenseInfo)
+               }
+           )
+               .then(response => response.json())
+               .then(data => processSuccess(data))
+               .catch(error => alert("Unable to create expense: " + error));
+           return false;
+        }
+
+        function processSuccess(response) {
+            console.log("Created expense: ");
+            console.log(response);
+            alert("Created expense: " + JSON.stringify(response));
+        }
+    </script>
+</head>
+<body>
+    <h1>Create Expense</h1>
+    <form action="javascript:void(0);" onsubmit="return createNewExpense()">
+        <input type="text" id="expenseValue" placeholder="Value" />  <br />
+        <input type="text" id="expenseTitle" placeholder="Title" />  <br />
+        <input type="text" id="receiverId" placeholder="Receiver ID" /> <br />
+        <select id="categoryId"> 
+            <option value="" disabled selected hidden>Choose category</option>
+            <option value="1">Food</option>
+            <option value="3">Salarie</option>
+            <option value="1005">Bills</option>
+            <option value="1003"> Bank Transfer</option>
+            <option value="1004">Entertainment</option>
+            <option value="1002">Office Equipment</option>
+        </select><br />
+        <input type="submit" value="Create Expense"/>
+    </form>
+</body>
+</html>
