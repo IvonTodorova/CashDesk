@@ -57,7 +57,7 @@ namespace CashDesk.Controllers
 
             _incomeRepo.CreateDailyIncome(newIncome);
             _context.SaveChanges();
-            return Ok();
+            return Ok(newIncome);
         }
 
         [HttpPost]
